@@ -31,3 +31,20 @@ body {
 .password-input {
   letter-spacing: 0.2em; /* Adjust spacing as desired */
 }
+
+/* Add this CSS to your globals.css or a dedicated CSS file */
+.fixed-footer {
+  margin-top: auto;
+  position: fixed;  /* Fixed position */
+  bottom: 0;        /* Stick to the bottom */
+  left: 0;          /* Align to the left */
+  right: 0;         /* Stretch to the right */
+  background-color: #0a0a0a; /* Optional: Change based on your design */
+  padding: 30px;   /* Add padding for spacing */
+  border-top: 1px solid #ccc; /* Optional: Add a border */
+  z-index: 1000;   /* Ensure it appears above other elements */
+  margin-inline: 10px;
+  margin-right: 150px;
+  position: relative;
+}
+

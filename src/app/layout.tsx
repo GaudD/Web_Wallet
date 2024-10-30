@@ -25,10 +25,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased pl-[100px] overflow-x-hidden`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased pl-[100px] overflow-x-hidden flex flex-col`}>
+        <main className="flex-grow">
+          {children}
+        </main>
+        <footer >
+          <p className="bg-#0a0a0a text-white p-4 border-t border-zinc-600">
+            Designed and developed by <b>Gaurav</b>
+          </p>
+        </footer>
       </body>
     </html>
   );

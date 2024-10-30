@@ -2,15 +2,26 @@
 
 import { generateSolanaKeypair } from "@/app/api/keygen/route";
 import DropDown from "./dropdown";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie"; // Import js-cookie
 
 export default function Main() {
-  // State to store the generated mnemonic
   const [mnemonic, setMnemonic] = useState<string | null>(null);
+
+  // Check if a mnemonic exists in cookies upon component mount
+  useEffect(() => {
+    const storedMnemonic = Cookies.get("mnemonic");
+    if (storedMnemonic) {
+      setMnemonic(storedMnemonic);
+    }
+  }, []);
 
   const Generate = () => {
     const { mnemonic: generatedMnemonic } = generateSolanaKeypair();
-    setMnemonic(generatedMnemonic); // Set the generated mnemonic in state
+    setMnemonic(generatedMnemonic);
+
+    // Set the generated mnemonic in a cookie
+    Cookies.set("mnemonic", generatedMnemonic, { expires: 7 });
   };
 
   return (
@@ -29,13 +40,12 @@ export default function Main() {
           </svg>
           Gaud
         </div>
-        
+
         {!mnemonic && <div className="mb-5 mt-[45px] flex flex-col">
           <p className="text-[50px] font-semibold">
             Secret Recovery Phrase
           </p>
 
-          {/* Conditionally render the text above and below based on mnemonic state */}
           {!mnemonic && (
             <>
               <p className="text-[20px] mb-3">
@@ -60,7 +70,6 @@ export default function Main() {
           )}
         </div>}
         
-        {/* Conditionally render DropDown with animation */}
         <div className={`transition-opacity transform ${mnemonic ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-5"} duration-500 ease-in-out`}>
           {mnemonic && <DropDown mnemonic={mnemonic} />}
         </div>
