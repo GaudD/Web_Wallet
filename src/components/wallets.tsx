@@ -25,6 +25,7 @@ export const Wallet = ({ mnemonic }: WalletProps) => {
         if (mnemonic) {
             generateKeys(); // Generate keys every time mnemonic changes
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mnemonic]);
     
     const generateKeys = async () => {
