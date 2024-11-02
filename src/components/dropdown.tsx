@@ -31,7 +31,7 @@ const DropDown: React.FC<DropDownProps> = ({ mnemonic, clearMnemonic }) => {
   };
 
   return (
-    <div className="relative w-10/12 pt-5 max-h-screen">
+    <div className="relative w-10/12 pt-5 h-full">
       <div className="transition-all duration-300 border p-2.5 rounded-md border-zinc-700">
         <button
           onClick={toggleDropdown}
