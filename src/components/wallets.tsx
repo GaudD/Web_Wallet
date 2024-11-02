@@ -22,40 +22,31 @@ export const Wallet = ({ mnemonic }: WalletProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
 
     useEffect(() => {
-        const cachedPublicKey = localStorage.getItem("publicKey");
-
-        if (cachedPublicKey) {
-            setPublicKey(cachedPublicKey);
-            console.log("Using cached public key:", cachedPublicKey);
-            fetchBalance(cachedPublicKey);
-        } else {
-            generateKeys();
+        if (mnemonic) {
+            generateKeys(); // Generate keys every time mnemonic changes
         }
     }, [mnemonic]);
-
+    
     const generateKeys = async () => {
         try {
             const seed = bip39.mnemonicToSeedSync(mnemonic);
             const derivationPath = `m/44'/501'/0'/0'`;
             const derivedSeed = derivePath(derivationPath, seed.toString("hex")).key;
             const keypair = Keypair.fromSecretKey(nacl.sign.keyPair.fromSeed(derivedSeed).secretKey);
-
+    
             const publicKeyBase58 = keypair.publicKey.toBase58();
             const privateKeyBase58 = bs58.encode(keypair.secretKey);
-
+    
             setPrivateKey(privateKeyBase58);
             setPublicKey(publicKeyBase58);
-
-            // Cache public key
-            localStorage.setItem("publicKey", publicKeyBase58);
-            console.log("Generated and cached public key:", publicKeyBase58);
-
+    
             // Fetch balance for the new public key
             fetchBalance(publicKeyBase58);
         } catch (error) {
             console.error("Error generating keys:", error);
         }
     };
+    
 
     const fetchBalance = async (address: string) => {
         try {
@@ -95,7 +86,7 @@ export const Wallet = ({ mnemonic }: WalletProps) => {
     };
 
     return (
-        <div className="relative">
+        <div className="relative h-full">
             {isModalOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-40" />} {/* Full-screen translucent background */}
             <div className="border rounded-xl border-zinc-600 mt-8 mb-[70px] max-h-screen z-50 relative">
                 <div className="flex justify-between">
@@ -140,8 +131,8 @@ export const Wallet = ({ mnemonic }: WalletProps) => {
             </div>
             <SendModal 
                 isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                publicKey={publicKey} 
+                onClose={() => setIsModalOpen(false)}
+                privateKey={privateKey}
             />
         </div>
     );

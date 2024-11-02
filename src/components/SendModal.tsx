@@ -1,41 +1,80 @@
-'use client'
+'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 interface SendModalProps {
     isOpen: boolean;
     onClose: () => void;
-    publicKey: string; // Pass public key to use it for sending
+    privateKey: string; // Remove publicKey if not needed
 }
 
-const SendModal: React.FC<SendModalProps> = ({ isOpen, onClose, publicKey }) => {
+const SendModal: React.FC<SendModalProps> = ({ isOpen, onClose, privateKey }) => {
     const [recipientAddress, setRecipientAddress] = useState("");
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState<number | string>(""); // Initialize as an empty string
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
+    const [success, setSuccess] = useState<JSX.Element | null>(null);
+
+    useEffect(() => {
+        if (success) {
+            setSuccess(null)
+        }
+        if (error) {
+            setError(null)
+        }
+        if (recipientAddress != "") {
+            setRecipientAddress("")
+        }
+        if (amount != "") {
+            setAmount("")
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [onClose])
 
     const handleSend = async () => {
         setLoading(true);
         setError(null);
         setSuccess(null);
 
+        // Input validation
+        if (!recipientAddress || !privateKey || !amount || Number(amount) <= 0) {
+            setError("Please enter valid recipient address and amount.");
+            setLoading(false);
+            return;
+        }
+
         try {
             const response = await axios.post("/api/send", {
-                from: publicKey,
-                to: recipientAddress,
-                amount: amount,
+                recipient: recipientAddress,
+                amount: Number(amount),
+                privateKey,
             });
 
-            if (response.status === 200) {
-                setSuccess("Transaction successful!");
+            if (response.status === 200 && response.data.success) {
+                const transactionSignature = response.data.signature;
+                setSuccess(
+                    <>
+                        Transaction successful!{" "}
+                        <a 
+                            href={`https://solscan.io/tx/${transactionSignature}?cluster=devnet`} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-blue-500 underline"
+                        >
+                            View on Solscan
+                        </a>
+                    </>
+                );
+                setRecipientAddress(""); // Clear the input field
+                setAmount(""); // Clear the input field
             } else {
                 setError("Transaction failed. Please try again.");
             }
         } catch (err) {
             console.error(err);
-            setError("Error sending SOL.");
+            const errorMessage = (err as Error).message || "Error sending SOL."; // Specify the type as Error
+            setError("Error sending SOL: " + errorMessage);
         } finally {
             setLoading(false);
         }
@@ -44,8 +83,8 @@ const SendModal: React.FC<SendModalProps> = ({ isOpen, onClose, publicKey }) => 
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-            <div className="bg-neutral-950 rounded-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-neutral-950 h-screen mr-36">
+            <div className="bg-neutral-950 rounded-lg p-6 max-w-md w-full border mb-20">
                 <div className="flex justify-between items-center">
                     <h2 className="text-lg font-semibold">Send SOL</h2>
                     <button onClick={onClose} aria-label="Close Modal" className="text-gray-600 hover:text-gray-900">
@@ -69,7 +108,7 @@ const SendModal: React.FC<SendModalProps> = ({ isOpen, onClose, publicKey }) => 
                     <input
                         type="number"
                         value={amount}
-                        onChange={(e) => setAmount(Number(e.target.value))}
+                        onChange={(e) => setAmount(e.target.value)}
                         className="border rounded-lg p-2 w-full text-black"
                         placeholder="Enter amount to send"
                     />

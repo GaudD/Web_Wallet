@@ -20,7 +20,7 @@ export default function Main() {
     // Set loading to false after 3 seconds
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1500);
+    }, 300);
 
     return () => clearTimeout(timer); // Cleanup the timer on component unmount
   }, []);
@@ -52,7 +52,7 @@ export default function Main() {
   };
 
   return (
-    <div className="h-full mx-auto pr-[65px] font-roboto relative">
+    <div className="h-screen mx-auto pr-[65px] font-roboto relative">
       {loading && (
         <div className="absolute inset-0 bg-neutral-950 bg-opacity-70 flex items-center justify-center z-50 h-screen">
         </div>

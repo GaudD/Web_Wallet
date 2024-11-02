@@ -13,7 +13,7 @@ export const Navbar = () => {
           </svg>
             Gaud
             <div className="text-[15px] border rounded-3xl py-1 ml-3 border-slate-200 bg-zinc-900 px-3">
-                Beta
+                Devnet
             </div>
         </div>
     )

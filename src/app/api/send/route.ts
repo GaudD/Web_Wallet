@@ -8,6 +8,11 @@ export async function POST(request: Request) {
     try {
         const { recipient, amount, privateKey } = await request.json();
 
+        // Validate input
+        if (!recipient || !privateKey || typeof amount !== 'number' || amount <= 0) {
+            return NextResponse.json({ success: false, error: 'Invalid input parameters' }, { status: 400 });
+        }
+
         // Decode the private key from base58
         const decodedKey = bs58.decode(privateKey);
         const senderKeypair = Keypair.fromSecretKey(decodedKey);
@@ -28,6 +33,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, signature });
     } catch (error) {
         console.error("Transaction error:", error);
-        return NextResponse.json({ success: false, error: 'Transaction failed' }, { status: 500 });
+        const errorMessage = (error as Error).message || 'Transaction failed';
+        return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
     }
+    
 }
