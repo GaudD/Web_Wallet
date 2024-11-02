@@ -1,6 +1,6 @@
 "use client";
 
-import { generateSolanaKeypair } from "@/app/api/keygen/route";
+import { generateSolanaKeypair } from "@/components/keygen/route";
 import DropDown from "./dropdown";
 import { useState, useEffect } from "react";
 import * as bip39 from "bip39"; // Import bip39 for mnemonic validation
